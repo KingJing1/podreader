@@ -2,7 +2,7 @@
 name: podreader
 description: >
   精读提炼与高质量中文写作技能。用于将播客转录稿、长文、报告、书籍章节、视频转录稿等长内容提炼为高质量的杂志风格中文精读文章，并可输出为 EPUB 电子书或微信公众号格式。当用户提到"精读""总结""提炼""播客""EPUB""转公众号"或上传转录稿/长文要求整理时，使用此技能。也适用于任何需要高质量中文写作的总结任务——即使用户没有明确说"精读"，只要输入是长内容且需要提炼输出，就应触发此技能。
-  Author: @一龙小包子 | Version: 1.0 | Date: 2026-03-06 | License: CC BY 4.0
+  Author: @KingJing001 | Version: 1.0 | Date: 2026-03-06 | License: CC BY 4.0
 ---
 
 # PodReader — 精读提炼与高质量中文写作
@@ -184,7 +184,7 @@ description: >
 期数：第 N 期
 时长：XX 分钟
 发布日期：YYYY-MM-DD
-编辑整理：@一龙小包子、Claude Opus
+编辑整理：@KingJing001、Claude Opus
 ```
 
 对于非播客内容（文章、书籍等），元信息调整为：
@@ -192,7 +192,7 @@ description: >
 原文：《标题》
 作者：作者名
 发布日期：YYYY-MM-DD
-编辑整理：@一龙小包子、Claude Opus
+编辑整理：@KingJing001、Claude Opus
 ```
 
 ### EPUB 技术规范
@@ -313,7 +313,7 @@ blockquote p {
 
 ```
 title: 从文章 h1 标题自动生成
-author: @一龙小包子
+author: @KingJing001
 language: zh-CN
 identifier: 使用 uuid4 生成
 ```
