@@ -170,42 +170,14 @@ description: >
 # 第二层：输出格式
 
 用户指定输出格式时调用此层。支持两种格式：EPUB 电子书、微信公众号 HTML。
+CSS 样式和打包逻辑已固化在 `scripts/` 目录的 Python 脚本中，确保每次输出格式完全一致。
 
-## 格式 A：EPUB 电子书
+## 文章 HTML 结构标签
 
-### 播客/音视频内容的元信息（必须包含）
-
-每篇 EPUB 开头必须包含以下元信息块（有多少写多少，缺失的不写）：
-
-```
-播客：《播客名》
-本期：标题
-嘉宾：嘉宾名
-期数：第 N 期
-时长：XX 分钟
-发布日期：YYYY-MM-DD
-编辑整理：@一龙小包子、Claude Opus
-```
-
-对于非播客内容（文章、书籍等），元信息调整为：
-```
-原文：《标题》
-作者：作者名
-发布日期：YYYY-MM-DD
-编辑整理：@一龙小包子、Claude Opus
-```
-
-### EPUB 技术规范
-
-- 使用标准 EPUB 3.0 规范
-- 使用 Python 创建（ZIP 格式），包含 mimetype、META-INF/container.xml、OEBPS/content.opf、nav.xhtml 等完整结构
-- 保存到 `/mnt/user-data/outputs/` 目录
-- 文件名清晰描述内容，使用中文
-
-### 文章 HTML 结构标签
+无论哪种输出格式，精读文章的 HTML 内容必须使用以下语义标签：
 
 ```html
-<div class="metadata">播客元信息</div>
+<div class="metadata">元信息（播客出处或文章来源）</div>
 <h1>文章主标题</h1>
 <p class="subtitle">副标题（如有）</p>
 <div class="lede"><p>开篇引导段落</p></div>
@@ -216,158 +188,79 @@ description: >
 <div class="quote-attr">——说话者</div>
 ```
 
-### CSS 样式规范
+## 元信息（必须包含）
 
-```css
-body {
-  font-family: "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", serif;
-  line-height: 1.8;
-  /* 不设 font-size，让阅读器控制 */
-  /* 不设 background-color，让阅读器控制暗色/亮色模式 */
-  margin: 1.5em;
-  color: #333;
-}
-
-h1 {
-  font-size: 1.6em;
-  line-height: 1.3;
-  margin-bottom: 0.3em;
-}
-
-h2 {
-  font-size: 1.2em;
-  margin-top: 2em;
-  margin-bottom: 0.8em;
-}
-
-p {
-  margin-bottom: 0.8em;
-  text-align: justify;
-}
-
-.subtitle {
-  font-size: 0.95em;
-  color: #666;
-  margin-bottom: 1.5em;
-  line-height: 1.6;
-}
-
-.lede {
-  background: rgba(128, 128, 128, 0.05);
-  border-left: 4px solid rgba(128, 128, 128, 0.3);
-  border-radius: 4px;
-  padding: 1em 1.2em;
-  margin: 1.5em 0;
-}
-
-.lede p {
-  margin-bottom: 0.5em;
-}
-
-blockquote {
-  background: rgba(128, 128, 128, 0.04);
-  border-left: 4px solid rgba(128, 128, 128, 0.25);
-  border-radius: 4px;
-  padding: 0.8em 1.2em;
-  margin: 1.2em 0;
-  font-style: italic;
-  /* 绝对不要设置 background-color 为白色或任何不透明色 */
-}
-
-blockquote p {
-  margin-bottom: 0.3em;
-}
-
-.quote-attr {
-  text-align: right;
-  font-size: 0.85em;
-  color: #888;
-  margin-top: -0.5em;
-  margin-bottom: 1.2em;
-}
-
-.metadata {
-  font-size: 0.8em;
-  color: #999;
-  border-bottom: 1px solid rgba(128, 128, 128, 0.2);
-  padding-bottom: 1em;
-  margin-bottom: 2em;
-  line-height: 1.6;
-}
-
-.section-break {
-  text-align: center;
-  margin: 2em 0;
-  color: #ccc;
-  font-size: 1.2em;
-  letter-spacing: 0.5em;
-}
+播客/音视频内容：
+```
+播客：《播客名》
+本期：标题
+嘉宾：嘉宾名
+期数：第 N 期
+时长：XX 分钟
+发布日期：YYYY-MM-DD
+编辑整理：@一龙小包子、Claude Opus
 ```
 
-**关键原则：**
-- 所有背景色使用 `rgba()` 半透明值，确保暗色模式兼容
-- 不设置 `body` 的 `font-size` 和 `background-color`
-- 不对 `blockquote` 设置不透明背景色
-
-### EPUB 元数据
-
+非播客内容（文章、书籍等）：
 ```
-title: 从文章 h1 标题自动生成
-author: @一龙小包子
-language: zh-CN
-identifier: 使用 uuid4 生成
+原文：《标题》
+作者：作者名
+发布日期：YYYY-MM-DD
+编辑整理：@一龙小包子、Claude Opus
+```
+
+有多少写多少，缺失的字段不写。"编辑整理"行始终保留。
+
+## 格式 A：EPUB 电子书
+
+调用 `scripts/build_epub.py` 生成。
+
+执行流程：
+1. 按第一层方法论撰写精读文章，输出为 HTML 内容（仅 `<body>` 内部）
+2. 将 HTML 内容写入临时文件 `/home/claude/article_body.html`
+3. 运行脚本：
+
+```bash
+python scripts/build_epub.py \
+  --title "文章标题" \
+  --body /home/claude/article_body.html \
+  --output /mnt/user-data/outputs/文章标题.epub
+```
+
+脚本内置了完整的 EPUB 3.0 结构、CSS 样式（衬线字体、1.8 行高、rgba 半透明背景色兼容暗色模式）、元数据生成和文末署名。
+
+**也可作为模块调用：**
+```python
+from scripts.build_epub import build_epub
+build_epub(title="文章标题", body_html=html_content, output_path="output.epub")
 ```
 
 ## 格式 B：微信公众号 HTML
 
-生成一个自包含的 HTML 文件，使用内联样式（因为公众号编辑器不支持 `<style>` 标签）。
+调用 `scripts/build_wechat.py` 生成。
 
-### 内联样式规范
+执行流程：
+1. 同上，撰写精读文章并输出 HTML 内容
+2. 将 HTML 内容写入临时文件
+3. 运行脚本：
 
-- 正文：`style="font-size:15px;color:#333;line-height:2;letter-spacing:1px;"`
-- 标题 h1：`style="font-size:22px;font-weight:bold;text-align:center;margin-bottom:8px;"`
-- 标题 h2：`style="font-size:18px;font-weight:bold;margin-top:32px;margin-bottom:16px;"`
-- 副标题：`style="font-size:14px;color:#888;text-align:center;margin-bottom:24px;"`
-- 引用块：`style="border-left:3px solid #d4d4d4;padding:12px 16px;margin:20px 0;color:#666;background:#f7f7f7;font-style:italic;"`
-- 元信息：`style="font-size:13px;color:#999;border-bottom:1px solid #eee;padding-bottom:16px;margin-bottom:24px;"`
-- 分隔符：`style="text-align:center;color:#ddd;margin:32px 0;letter-spacing:8px;"`
-
-### 公众号 HTML 文件结构
-
-```html
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head><meta charset="utf-8"><title>文章标题</title></head>
-<body style="max-width:680px;margin:0 auto;padding:20px;font-family:-apple-system,sans-serif;">
-  <!-- 内容使用内联样式 -->
-</body>
-</html>
+```bash
+python scripts/build_wechat.py \
+  --title "文章标题" \
+  --body /home/claude/article_body.html \
+  --output /mnt/user-data/outputs/文章标题_公众号.html
 ```
 
-保存到 `/mnt/user-data/outputs/` 目录，文件名后缀 `_公众号.html`。
-
-用户打开此 HTML 文件后，全选内容复制，粘贴到公众号编辑器即可保留基本排版。
+脚本自动将语义标签转换为内联样式（公众号编辑器不支持 `<style>` 标签），用户打开 HTML 文件后全选复制粘贴到公众号编辑器即可保留排版。
 
 ---
 
 ## 使用方式
 
-### 场景一：纯精读（无格式要求）
-
-用户说"帮我总结/精读这篇内容" → 只调用第一层，在对话中直接输出精读文章。
-
-### 场景二：播客转 EPUB
-
-用户上传转录稿并说"做成 EPUB"或"精读" → 调用第一层写文章 + 第二层格式 A 打包 EPUB。
-
-### 场景三：转微信公众号
-
-用户说"转公众号格式" → 调用第一层写文章 + 第二层格式 B 生成内联样式 HTML。
-
-### 场景四：同时输出
-
-用户说"EPUB 和公众号都要" → 同时生成两种格式文件。
-
-### 场景五：日常总结（非播客）
-
-用户上传长文/报告/书籍章节要求总结 → 调用第一层方法论，元信息使用非播客格式。
+| 用户说的话 | 调用内容 |
+|-----------|---------|
+| "帮我总结/精读这篇内容" | 第一层方法论，在对话中直接输出 |
+| "做成 EPUB" / "精读" + 转录稿 | 第一层 + `scripts/build_epub.py` |
+| "转公众号格式" | 第一层 + `scripts/build_wechat.py` |
+| "EPUB 和公众号都要" | 第一层 + 两个脚本都调用 |
+| 上传长文/报告要求总结 | 第一层方法论，元信息用非播客格式 |
