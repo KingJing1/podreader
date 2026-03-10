@@ -45,9 +45,14 @@
 ```
 podreader/
 ├── SKILL.md              # 技能定义文件（写作方法论 + 调用说明）
+├── editor/
+│   ├── index.html        # 可视化公众号排版器（左 Markdown，右预览）
+│   ├── styles.css        # 编辑器样式
+│   └── app.js            # Markdown 解析、预览和复制逻辑
 ├── scripts/
 │   ├── build_epub.py     # EPUB 3.0 生成器（CSS 样式、暗色模式兼容已内置）
-│   └── build_wechat.py   # 微信公众号 HTML 生成器（内联样式，复制粘贴即保留排版）
+│   ├── build_wechat.py   # 微信公众号 HTML 生成器（内联样式，复制粘贴即保留排版）
+│   └── serve_editor.py   # 本地可视化公众号排版器启动脚本
 ├── podreader.skill       # 打包好的一键安装文件
 ├── README.md
 └── LICENSE
@@ -66,6 +71,25 @@ python scripts/build_wechat.py --title "文章标题" --body article.html --outp
 ```
 
 脚本只依赖 Python 标准库，无需安装任何第三方包。
+
+### 可视化公众号排版器
+
+如果你想一边看预览一边微调排版，可以直接启动本地可视化编辑器：
+
+```bash
+python scripts/serve_editor.py
+```
+
+启动后打开浏览器访问 `http://127.0.0.1:8765/editor/` 即可。
+
+它支持：
+
+- 左侧直接粘贴成品 Markdown
+- 右侧实时预览公众号效果
+- 调整正文字号、行距、标题、引用样式
+- 一键复制成公众号可粘贴的富文本
+- 复制完整 HTML 或下载 `_公众号.html`
+- `:::meta`、`:::subtitle`、`:::lede` 这类公众号文章专用块
 
 ## License
 
