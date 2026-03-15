@@ -65,10 +65,12 @@ podreader/
 
 ## Philosophy
 
-1. **80/20** — 20% of reading time should capture 80% of the value. The rest is noise.
-2. **Terminology first** — If readers hit an unexplained term, they stop reading. Unblock them early.
-3. **Gem-driven** — A good deep-read makes the reader feel smarter. That's the bar.
-4. **Anti-AI-slop** — Information stacking isn't writing. Editorial judgment is.
+When the cost of generating content drops to zero, the scarce thing becomes curation. PodReader is built on that premise.
+
+1. **Editorial judgment over information** — Accumulating points isn't writing. Choosing which three things matter is.
+2. **Respect the reader's time** — 20% of reading should capture 80% of the value. The rest is noise, and noise is disrespectful.
+3. **Terminology first** — If a reader hits an unexplained term, they stop. Unblock them before they get there.
+4. **Anti-AI-slop as a value, not just a style rule** — Formulaic output erodes trust. Output that reads like a person wrote it is a commitment to the reader, not a aesthetic choice.
 
 ## License
 
